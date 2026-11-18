@@ -1,0 +1,32 @@
+# Verifica que cada actualizacion (incluidos los PR de Dependabot) no
+# introduzca vulnerabilidades ni rompa la aplicacion.
+name: dependency-check
+on:
+  pull_request:
+    paths: ["app/requirements*.txt", "Dockerfile", ".github/workflows/**"]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 11 * * 1"   # lunes 08:00 Chile
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Consistencia de dependencias
+        run: pip check
+      - name: SCA - vulnerabilidades conocidas
+        run: pip-audit -r requirements.txt --strict
+      - name: Pruebas funcionales y de seguridad
+        run: pytest -q
+      - name: SAST
+        run: bandit -r app.py -ll
