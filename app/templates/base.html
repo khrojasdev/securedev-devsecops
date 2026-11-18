@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head><meta charset="utf-8"><title>SecureDev Notes</title>
-<style>body{font-family:Arial,sans-serif;max-width:860px;margin:30px auto;padding:0 16px}nav a{margin-right:12px}pre{background:#f4f4f4;padding:10px}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:4px 8px}</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <nav>{% if session.get('user_id') %}<b>SecureDev Notes</b> | <a href="/dashboard">Mis notas</a><a href="/search?q=">Buscar</a><a href="/ping?host=127.0.0.1">Ping</a><a href="/admin">Admin</a><a href="/logout">Salir ({{ session.get('username') }})</a>{% else %}<b>SecureDev Notes</b>{% endif %}</nav>
