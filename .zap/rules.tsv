@@ -1,0 +1,21 @@
+10010	WARN	Cookie sin flag HttpOnly
+10020	WARN	Falta cabecera anti-clickjacking
+10021	WARN	Falta X-Content-Type-Options
+10036	WARN	Servidor revela version
+10038	WARN	Content Security Policy no definida
+10054	WARN	Cookie sin atributo SameSite
+10055	WARN	CSP con directivas inseguras
+10202	WARN	Ausencia de tokens anti-CSRF
+10023	WARN	Divulgacion de informacion de depuracion
+90022	WARN	Divulgacion de errores de aplicacion
+6	FAIL	Path Traversal
+40012	FAIL	XSS reflejado
+40014	FAIL	XSS persistente
+40018	FAIL	SQL Injection
+40024	FAIL	SQL Injection - SQLite
+40026	FAIL	XSS basado en DOM
+90019	FAIL	Inyeccion de codigo en servidor
+90020	FAIL	Inyeccion de comandos del SO
+90035	FAIL	Server Side Template Injection
+90036	FAIL	Server Side Template Injection (ciega)
+40046	FAIL	Server Side Request Forgery

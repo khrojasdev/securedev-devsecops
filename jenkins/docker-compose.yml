@@ -1,0 +1,16 @@
+# Levantar con:  docker compose -f jenkins/docker-compose.yml up -d --build
+services:
+  jenkins:
+    build: .
+    container_name: jenkins
+    # LAB: root para usar el socket Docker de Docker Desktop. En un entorno
+    # real se usaria un agente dedicado o Docker rootless.
+    user: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+volumes:
+  jenkins_home:
