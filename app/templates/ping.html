@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}
+<h2>Diagnóstico de red</h2>
+<form method="get" action="/ping"><input name="host" value="{{ host }}"><button>Ping</button></form>
+<pre>{{ output }}</pre>
+{% endblock %}
