@@ -1,6 +1,6 @@
 # VULN-13: dependencias desactualizadas con vulnerabilidades conocidas (CVE)
 Flask==2.2.2
-Werkzeug==2.2.2
+Werkzeug==3.1.9
 Jinja2==3.1.2
 MarkupSafe==2.1.1
 itsdangerous==2.1.2
