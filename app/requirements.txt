@@ -10,5 +10,5 @@ urllib3==1.26.12
 certifi==2022.9.24
 idna==3.4
 charset-normalizer==2.1.1
-gunicorn==22.0.0
+gunicorn==27.0.1
 packaging==21.3
