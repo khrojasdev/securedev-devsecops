@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<h2>Resultados para: {{ q }}</h2>
+<ul>{% for r in rows %}<li><a href="/note/{{ r['id'] }}">{{ r['title'] }}</a></li>{% endfor %}</ul>
+{% endblock %}

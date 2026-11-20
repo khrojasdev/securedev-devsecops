@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+rule_files:
+  - /etc/prometheus/alert_rules.yml
+
+scrape_configs:
+  - job_name: securedev
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["securedev-prod:5000"]
+        labels:
+          env: produccion
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
