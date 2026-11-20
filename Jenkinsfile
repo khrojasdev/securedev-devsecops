@@ -52,8 +52,8 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    docker build --pull --target test    -t "$TEST_IMAGE" .
-                    docker build --pull --target runtime -t "$IMAGE" -t securedev:latest .
+                    docker build --target test    -t "$TEST_IMAGE" .
+                    docker build --target runtime -t "$IMAGE" -t securedev:latest .
                     docker image inspect "$IMAGE" --format "Imagen {{.Id}} creada {{.Created}}" | tee reports/image.txt
                 '''
             }
