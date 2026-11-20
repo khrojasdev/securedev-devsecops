@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Imagen multi-etapa: "test" (pruebas + SAST + SCA) y "runtime" (produccion).
-FROM python:3.13-slim AS base
+FROM python:3.15-slim AS base
 # Repositorios apt por HTTPS (algunas redes bloquean HTTP plano)
 RUN sed -i 's#http://deb.debian.org#https://deb.debian.org#g' /etc/apt/sources.list.d/debian.sources
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
