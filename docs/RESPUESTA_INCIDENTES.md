@@ -36,7 +36,7 @@ Contención, erradicación y recuperación → Actividades post-incidente.
 
 | ID | Fecha/hora | Alerta | Descripción | Acciones | Estado |
 |---|---|---|---|---|---|
-| INC-2026-01 | (completar) | AtaqueFuerzaBruta | 8 intentos sobre `admin` desde una IP; 3 bloqueados (HTTP 429) | Bloqueo automático 5 min, revisión de logs, sin acceso indebido | Cerrado |
-| INC-2026-02 | (completar) | IntentosDeInyeccion | Payloads SQLi/XSS/SSTI y de comandos en `/login`, `/search`, `/ping` | Entradas rechazadas o neutralizadas; sin impacto | Cerrado |
-| INC-2026-03 | (completar) | ViolacionesControlDeAcceso | Usuario `kevin` enumeró notas ajenas e intentó `/admin` (403/404) | Accesos denegados; usuario bajo revisión | Cerrado |
-| INC-2026-04 | (completar) | IntentosSSRFoCSRF | Intento SSRF a 169.254.169.254 y POST sin token CSRF | Solicitudes bloqueadas (400) | Cerrado |
+| INC-2026-01 | 2026-11-20 12:55:19 | AtaqueFuerzaBruta | 8 intentos sobre `admin` desde una IP; 3 bloqueados (HTTP 429) | Bloqueo automático 5 min, revisión de logs, sin acceso indebido | Cerrado |
+| INC-2026-02 | 2026-11-20 12:55:59 | IntentosDeInyeccion | Payloads SQLi/XSS/SSTI y de comandos en `/login`, `/search`, `/ping` | Entradas rechazadas o neutralizadas; sin impacto | Cerrado |
+| INC-2026-03 | 2026-11-20 12:56:04 | ViolacionesControlDeAcceso | Usuario `kevin` enumeró notas ajenas e intentó `/admin` (403/404) | Accesos denegados; usuario bajo revisión | Cerrado |
+| INC-2026-04 | 2026-11-20 12:56:04 | IntentosSSRFoCSRF | Intento SSRF a 169.254.169.254 y POST sin token CSRF | Solicitudes bloqueadas (400) | Cerrado |
