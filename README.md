@@ -1,6 +1,7 @@
-# SecureDev Notes — Pipeline DevSecOps (OCY1102 · Evaluación Parcial N°3)
+# Sistema Académico — Pipeline DevSecOps para SecureDev (OCY1102 · Evaluación Parcial N°3)
 
-Aplicación web Flask de notas usada como caso para implementar un pipeline CI/CD
+Aplicación Flask **Sistema Académico** (código vulnerable entregado en la evaluación:
+login, panel con biografía, actualización de biografía y logout). Se usa para implementar un pipeline CI/CD
 seguro con **Jenkins + Docker**, **OWASP ZAP**, **Dependabot**, **Prometheus/Grafana**
 y documentación con trazabilidad en el SDLC.
 
@@ -8,7 +9,8 @@ y documentación con trazabilidad en el SDLC.
 
 | Ruta | Contenido |
 |---|---|
-| `app/` | Código de la aplicación (versión corregida), plantillas, pruebas (`tests/`) y dependencias fijadas |
+| `app/` | Sistema Académico corregido (`app.py`, `init_db.py`, plantillas), pruebas (`tests/`) y dependencias fijadas. El código original está en la rama `baseline-vulnerable` |
+| `poc/` | `archivo_original.html` (prueba de concepto CSRF entregada) y `csrf_poc.html` (con el campo corregido) |
 | `Jenkinsfile` | Pipeline: Checkout → Build → Pruebas → SAST → SCA → Staging → DAST (ZAP) → Documentación → Producción → Monitorización |
 | `Dockerfile` | Imagen multi-etapa (`test` y `runtime`, usuario no root, healthcheck) |
 | `.zap/rules.tsv` | Reglas de ZAP: qué alertas detienen el pipeline (FAIL) y cuáles advierten (WARN) |
@@ -45,7 +47,7 @@ python scripts/simulate_attacks.py http://localhost:5000
 cd app
 python -m venv .venv; .venv\Scripts\activate
 pip install -r requirements.txt -r requirements-dev.txt
-pytest -q            # 21 pruebas (4 funcionales + 17 de seguridad)
-bandit -r app.py -ll # SAST
+pytest -q            # 18 pruebas (4 funcionales + 14 de seguridad, una por VULN)
+bandit -r . -x ./tests -ll # SAST
 pip-audit -r requirements.txt   # SCA
 ```

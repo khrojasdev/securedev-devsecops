@@ -29,4 +29,4 @@ jobs:
       - name: Pruebas funcionales y de seguridad
         run: pytest -q
       - name: SAST
-        run: bandit -r app.py -ll
+        run: bandit -r . -x ./tests -ll

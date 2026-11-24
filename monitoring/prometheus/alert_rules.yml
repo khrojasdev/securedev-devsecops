@@ -6,7 +6,7 @@ groups:
         for: 30s
         labels: {severity: critical}
         annotations:
-          summary: "La aplicacion SecureDev no responde"
+          summary: "La aplicacion (Sistema Academico) no responde"
           description: "Prometheus no puede recolectar metricas de produccion hace mas de 30s."
 
       - alert: AtaqueFuerzaBruta
@@ -17,23 +17,25 @@ groups:
           description: "Mas de 5 intentos fallidos/bloqueados en 2 minutos."
 
       - alert: IntentosDeInyeccion
-        expr: sum(increase(securedev_security_events_total{type=~"suspicious_input|command_injection_blocked|deserialization_rejected"}[5m])) > 3
+        expr: sum(increase(securedev_security_events_total{type="suspicious_input"}[5m])) > 3
         labels: {severity: high}
         annotations:
-          summary: "Intentos de inyeccion (SQLi/XSS/SSTI/comandos)"
-          description: "Se detectaron entradas maliciosas bloqueadas en los ultimos 5 minutos."
+          summary: "Intentos de inyeccion (SQLi / XSS / SSTI)"
+          description: "Entradas con patrones de ataque en login o biografia en los ultimos 5 minutos."
 
-      - alert: ViolacionesControlDeAcceso
-        expr: sum(increase(securedev_security_events_total{type=~"idor_attempt|access_denied"}[5m])) > 2
+      - alert: SesionFalsificada
+        expr: sum(increase(securedev_security_events_total{type="session_forgery"}[5m])) > 2
+        labels: {severity: high}
+        annotations:
+          summary: "Intentos de suplantacion de sesion"
+          description: "Cookies user_session escritas a mano o sesiones con firma invalida."
+
+      - alert: IntentosCSRF
+        expr: sum(increase(securedev_security_events_total{type="csrf_rejected"}[5m])) > 1
         labels: {severity: medium}
         annotations:
-          summary: "Intentos de acceso no autorizado (IDOR / escalada a admin)"
-
-      - alert: IntentosSSRFoCSRF
-        expr: sum(increase(securedev_security_events_total{type=~"ssrf_blocked|csrf_rejected"}[5m])) > 1
-        labels: {severity: medium}
-        annotations:
-          summary: "Solicitudes SSRF o CSRF bloqueadas"
+          summary: "Solicitudes CSRF bloqueadas"
+          description: "POST sin token anti-CSRF valido (por ejemplo, la pagina archivo.html)."
 
       - alert: TasaAltaErrores5xx
         expr: sum(rate(securedev_http_requests_total{status=~"5.."}[2m])) > 0.1

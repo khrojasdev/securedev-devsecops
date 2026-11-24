@@ -1,12 +1,13 @@
 {% extends 'base.html' %}{% block content %}
-<h2>Mis notas</h2>
-<ul>{% for n in notes %}<li><a href="/note/{{ n['id'] }}">{{ n['title'] }}</a></li>{% endfor %}</ul>
-<h3>Nueva nota</h3>
-<form method="post" action="/note/new">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
-  <p><input name="title" placeholder="Título"></p>
-  <p><textarea name="content" placeholder="Contenido"></textarea></p>
-  <button type="submit">Guardar</button>
+<h1>Panel de {{ datos['username'] }}</h1>
+<p><b>Rol:</b> {{ datos['rol'] }}</p>
+<p><b>Biografía:</b> {{ datos['bio'] }}</p>
+<hr>
+<h3>Actualizar Biografía</h3>
+<form action="/update_bio" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="text" name="nueva_bio" placeholder="Escribe algo..." maxlength="500">
+  <input type="submit" value="Guardar Cambios">
 </form>
-<form method="get" action="/search"><input name="q" placeholder="Buscar notas"><button>Buscar</button></form>
+<br><a href="/logout">Cerrar Sesión</a>
 {% endblock %}

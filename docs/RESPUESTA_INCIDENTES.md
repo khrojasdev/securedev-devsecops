@@ -14,9 +14,9 @@ Contención, erradicación y recuperación → Actividades post-incidente.
 | Alerta | Señal | Primer análisis |
 |---|---|---|
 | `AtaqueFuerzaBruta` | > 5 logins fallidos/bloqueados en 2 min | `docker logs securedev-prod \| findstr login_failure` → IP y usuario atacado |
-| `IntentosDeInyeccion` | `suspicious_input`, `command_injection_blocked`, `deserialization_rejected` | Revisar campo `sample` del log para identificar el payload (SQLi, XSS, SSTI, comandos) |
-| `ViolacionesControlDeAcceso` | `idor_attempt`, `access_denied` | Identificar el usuario autenticado que enumera recursos o intenta entrar a `/admin` |
-| `IntentosSSRFoCSRF` | `ssrf_blocked`, `csrf_rejected` | Revisar URLs objetivo (metadata cloud, `file://`) u origen de los POST |
+| `IntentosDeInyeccion` | `suspicious_input` (login o biografía) | Revisar el campo `sample` del log para identificar el payload (SQLi, XSS, SSTI) |
+| `SesionFalsificada` | `session_forgery` | Cookie `user_session` escrita a mano o sesión con firma inválida: identificar la IP |
+| `IntentosCSRF` | `csrf_rejected` | POST sin token válido: revisar el origen (página como `archivo.html`) |
 | `SecureDevCaida` / `TasaAltaErrores5xx` | `up == 0` o 5xx > 0,1/s | `docker ps`, `docker logs`, healthcheck |
 
 ## 3. Contención, erradicación y recuperación
@@ -36,7 +36,3 @@ Contención, erradicación y recuperación → Actividades post-incidente.
 
 | ID | Fecha/hora | Alerta | Descripción | Acciones | Estado |
 |---|---|---|---|---|---|
-| INC-2026-01 | 2026-11-20 12:55:19 | AtaqueFuerzaBruta | 8 intentos sobre `admin` desde una IP; 3 bloqueados (HTTP 429) | Bloqueo automático 5 min, revisión de logs, sin acceso indebido | Cerrado |
-| INC-2026-02 | 2026-11-20 12:55:59 | IntentosDeInyeccion | Payloads SQLi/XSS/SSTI y de comandos en `/login`, `/search`, `/ping` | Entradas rechazadas o neutralizadas; sin impacto | Cerrado |
-| INC-2026-03 | 2026-11-20 12:56:04 | ViolacionesControlDeAcceso | Usuario `kevin` enumeró notas ajenas e intentó `/admin` (403/404) | Accesos denegados; usuario bajo revisión | Cerrado |
-| INC-2026-04 | 2026-11-20 12:56:04 | IntentosSSRFoCSRF | Intento SSRF a 169.254.169.254 y POST sin token CSRF | Solicitudes bloqueadas (400) | Cerrado |
