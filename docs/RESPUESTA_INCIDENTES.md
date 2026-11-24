@@ -36,3 +36,7 @@ Contención, erradicación y recuperación → Actividades post-incidente.
 
 | ID | Fecha/hora | Alerta | Descripción | Acciones | Estado |
 |---|---|---|---|---|---|
+| INC-2026-01 | 2026-11-24 15:02:39 | IntentosDeInyeccion | Payloads `admin' --`, `x', rol='admin`, `<script>` y `{{7*7}}` en login y biografía | Consultas parametrizadas y autoescape: rechazados o guardados como texto; el rol del alumno sigue en `user` | Cerrado |
+| INC-2026-02 | 2026-11-24 15:04:34 | SesionFalsificada | 4 accesos con la cookie `user_session=admin` (por ronda) | Redirigidos al login (302); la sesión firmada no se puede falsificar | Cerrado |
+| INC-2026-03 | 2026-11-24 15:04:44 | AtaqueFuerzaBruta | 8 intentos sobre `admin` + 3 SQLi en el login; 11 respuestas 429 en total | Bloqueo automático 5 min; revisar la IP de origen | Cerrado |
+| INC-2026-04 | 2026-11-24 15:04:44 | IntentosCSRF | 3 POST a `/update_bio` sin token (por ronda), como `archivo.html` | Bloqueados (400); biografía intacta | Cerrado |
