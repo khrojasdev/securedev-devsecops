@@ -1,0 +1,35 @@
+# Stack de monitorizacion de produccion: Prometheus (metricas + reglas de
+# alerta) y Grafana (visualizacion). La configuracion se "hornea" en las
+# imagenes para que funcione igual desde Jenkins o desde tu PC.
+#   docker compose -p securedev-monitoring -f monitoring/docker-compose.yml up -d --build
+services:
+  prometheus:
+    build: ./prometheus
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    ports:
+      - "9090:9090"
+    networks: [securedev-net]
+    restart: unless-stopped
+
+  grafana:
+    build: ./grafana
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-SecureDev-Grafana-2026}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_COOKIE_SAMESITE: strict
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+    ports:
+      - "3000:3000"
+    depends_on: [prometheus]
+    networks: [securedev-net]
+    restart: unless-stopped
+
+networks:
+  securedev-net:
+    external: true

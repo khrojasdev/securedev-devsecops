@@ -1,27 +1,28 @@
-"""Pruebas funcionales: la correccion de seguridad no rompe la aplicacion."""
-from conftest import csrf, login
+"""Pruebas funcionales: deben pasar en AMBAS versiones (la correccion no
+rompe la funcionalidad del Sistema Academico)."""
+from conftest import login, update_bio
 
 
-def test_login_valido_redirige_a_dashboard(client):
-    r = login(client, "kevin")
-    assert r.headers["Location"].endswith("/dashboard")
+def test_pagina_login_disponible(client):
+    r = client.get("/login")
+    assert r.status_code == 200
+    assert "<form" in r.get_data(as_text=True)
 
 
-def test_dashboard_muestra_solo_mis_notas(client):
-    login(client, "kevin")
+def test_login_valido_muestra_panel(client):
+    login(client, "alumno")
     html = client.get("/dashboard").get_data(as_text=True)
-    assert "Pendientes" in html
-    assert "Privado de Ana" not in html
+    assert "Panel de alumno" in html
 
 
-def test_crear_y_buscar_nota(client):
-    login(client, "kevin")
-    token = csrf(client, "/dashboard")
-    r = client.post("/note/new", data={"title": "Nota QA", "content": "ok", "csrf_token": token})
-    assert r.status_code == 302
-    assert "Nota QA" in client.get("/search?q=QA").get_data(as_text=True)
+def test_actualizar_biografia(client):
+    login(client, "alumno")
+    update_bio(client, "Me gusta programar en Python")
+    assert "Me gusta programar en Python" in client.get("/dashboard").get_data(as_text=True)
 
 
-def test_rutas_protegidas_exigen_sesion(client):
-    for path in ("/dashboard", "/search?q=a", "/ping", "/admin"):
-        assert client.get(path).status_code == 302
+def test_logout_cierra_sesion(client):
+    login(client, "alumno")
+    client.get("/logout")
+    r = client.get("/dashboard")
+    assert r.status_code == 302 and "/login" in r.headers["Location"]

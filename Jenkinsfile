@@ -1,5 +1,6 @@
 // =============================================================================
 // SecureDev - Pipeline CI/CD con seguridad integrada (DevSecOps)
+// Aplicacion: Sistema Academico (codigo entregado en la evaluacion)
 // Etapas: Checkout -> Build -> Pruebas -> SAST -> SCA (dependencias) ->
 //         Deploy Staging -> DAST (OWASP ZAP) -> Documentacion/Trazabilidad ->
 //         Deploy Produccion -> Monitorizacion (Prometheus/Grafana)
@@ -13,8 +14,6 @@ pipeline {
             description: 'Si es true, un hallazgo de seguridad DETIENE el pipeline. Usar false solo para documentar la linea base vulnerable.')
         choice(name: 'ZAP_SCAN', choices: ['full', 'baseline'],
             description: 'full = escaneo activo (ataca la app en staging); baseline = solo pasivo')
-        string(name: 'SCAN_USER', defaultValue: 'kevin', description: 'Usuario para el escaneo autenticado de ZAP')
-        password(name: 'SCAN_PASSWORD', defaultValue: 'Kev1n!SecureDev-2026', description: 'Contrasena del usuario de escaneo (staging)')
         booleanParam(name: 'DEPLOY_PROD', defaultValue: true, description: 'Desplegar a produccion si todos los controles pasan')
     }
 
@@ -35,6 +34,11 @@ pipeline {
         ZAP_IMAGE  = 'ghcr.io/zaproxy/zaproxy:stable'
         // Secreto de la app guardado en Jenkins > Credentials (Secret text)
         SECRET_KEY = credentials('securedev-secret-key')
+        // Usuario de laboratorio para el escaneo autenticado de ZAP y la simulacion
+        // de ataques. La version corregida lo crea con esta clave (ALUMNO_PASSWORD);
+        // el codigo original usa su clave por defecto (12345).
+        LAB_USER     = 'alumno'
+        LAB_PASSWORD = 'Alumn0!Academico-2026'
     }
 
     stages {
@@ -75,9 +79,9 @@ pipeline {
                 script {
                     // Falla si hay hallazgos de severidad MEDIA o ALTA (-ll)
                     def rc = runInTestImage('sast',
-                        'bandit -r app.py -f json -o /reports/bandit.json; ' +
-                        'bandit -r app.py -f html -o /reports/bandit.html; ' +
-                        'bandit -r app.py -ll')
+                        'bandit -r . -x ./tests -f json -o /reports/bandit.json; ' +
+                        'bandit -r . -x ./tests -f html -o /reports/bandit.html; ' +
+                        'bandit -r . -x ./tests -ll')
                     gate(rc, 'SAST (Bandit)')
                 }
             }
@@ -105,7 +109,7 @@ pipeline {
                     docker network inspect "$NET" >/dev/null 2>&1 || docker network create "$NET"
                     docker rm -f "$STAGING" >/dev/null 2>&1 || true
                     docker run -d --name "$STAGING" --network "$NET" \
-                        -e SECRET_KEY="$SECRET_KEY" -e KEVIN_PASSWORD="$SCAN_PASSWORD" "$IMAGE"
+                        -e SECRET_KEY="$SECRET_KEY" -e ALUMNO_PASSWORD="$LAB_PASSWORD" "$IMAGE"
                     for i in $(seq 1 30); do
                         if docker run --rm --network "$NET" curlimages/curl -fsS "http://$STAGING:5000/login" >/dev/null 2>&1; then
                             echo "Staging disponible"; exit 0; fi
@@ -122,7 +126,7 @@ pipeline {
                     // Cookie de sesion para escanear tambien las paginas autenticadas
                     def cookie = sh(returnStdout: true, script: '''
                         docker run --rm --network "$NET" "$TEST_IMAGE" \
-                          python /scripts/get_session.py "http://$STAGING:5000" "$SCAN_USER" "$SCAN_PASSWORD" || true
+                          python /scripts/get_session.py "http://$STAGING:5000" "$LAB_USER" "$LAB_PASSWORD" || true
                     ''').trim()
                     def zapCmd = params.ZAP_SCAN == 'full' ? 'zap-full-scan.py -m 2 -T 15' : 'zap-baseline.py -m 2'
                     sh "docker rm -f zap-${BUILD_NUMBER} >/dev/null 2>&1 || true"
@@ -173,9 +177,9 @@ pipeline {
                     docker volume create securedev-data >/dev/null
                     docker run -d --name "$PROD" --network "$NET" --restart unless-stopped \
                         -p 5000:5000 -v securedev-data:/data \
-                        --read-only --tmpfs /tmp --cap-drop ALL --cap-add NET_RAW \
+                        --read-only --tmpfs /tmp --cap-drop ALL \
                         --security-opt no-new-privileges \
-                        -e SECRET_KEY="$SECRET_KEY" "$IMAGE"
+                        -e SECRET_KEY="$SECRET_KEY" -e ALUMNO_PASSWORD="$LAB_PASSWORD" "$IMAGE"
                     echo "$IMAGE desplegada en produccion (http://localhost:5000)" | tee reports/deploy.txt
                 '''
             }

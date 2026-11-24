@@ -1,0 +1,52 @@
+groups:
+  - name: securedev-seguridad
+    rules:
+      - alert: SecureDevCaida
+        expr: up{job="securedev"} == 0
+        for: 30s
+        labels: {severity: critical}
+        annotations:
+          summary: "La aplicacion (Sistema Academico) no responde"
+          description: "Prometheus no puede recolectar metricas de produccion hace mas de 30s."
+
+      - alert: AtaqueFuerzaBruta
+        expr: increase(securedev_login_attempts_total{result=~"failure|locked"}[2m]) > 5
+        labels: {severity: high}
+        annotations:
+          summary: "Posible ataque de fuerza bruta al login"
+          description: "Mas de 5 intentos fallidos/bloqueados en 2 minutos."
+
+      - alert: IntentosDeInyeccion
+        expr: sum(increase(securedev_security_events_total{type="suspicious_input"}[5m])) > 3
+        labels: {severity: high}
+        annotations:
+          summary: "Intentos de inyeccion (SQLi / XSS / SSTI)"
+          description: "Entradas con patrones de ataque en login o biografia en los ultimos 5 minutos."
+
+      - alert: SesionFalsificada
+        expr: sum(increase(securedev_security_events_total{type="session_forgery"}[5m])) > 2
+        labels: {severity: high}
+        annotations:
+          summary: "Intentos de suplantacion de sesion"
+          description: "Cookies user_session escritas a mano o sesiones con firma invalida."
+
+      - alert: IntentosCSRF
+        expr: sum(increase(securedev_security_events_total{type="csrf_rejected"}[5m])) > 1
+        labels: {severity: medium}
+        annotations:
+          summary: "Solicitudes CSRF bloqueadas"
+          description: "POST sin token anti-CSRF valido (por ejemplo, la pagina archivo.html)."
+
+      - alert: TasaAltaErrores5xx
+        expr: sum(rate(securedev_http_requests_total{status=~"5.."}[2m])) > 0.1
+        for: 1m
+        labels: {severity: high}
+        annotations:
+          summary: "Tasa de errores 5xx elevada"
+
+      - alert: LatenciaAlta
+        expr: histogram_quantile(0.95, sum(rate(securedev_http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 2m
+        labels: {severity: low}
+        annotations:
+          summary: "Latencia p95 superior a 1 segundo"
