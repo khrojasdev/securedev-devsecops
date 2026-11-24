@@ -123,7 +123,9 @@ pipeline {
         stage('DAST - OWASP ZAP') {
             steps {
                 script {
-                    // Cookie de sesion para escanear tambien las paginas autenticadas
+                    // Cookie de sesion para escanear tambien las paginas autenticadas.
+                    // El escaneo parte en /dashboard: ninguna pagina publica enlaza al panel,
+                    // asi ZAP descubre el panel, el formulario /update_bio y luego /login.
                     def cookie = sh(returnStdout: true, script: '''
                         docker run --rm --network "$NET" "$TEST_IMAGE" \
                           python /scripts/get_session.py "http://$STAGING:5000" "$LAB_USER" "$LAB_PASSWORD" || true
@@ -134,7 +136,7 @@ pipeline {
                         docker create --name zap-${BUILD_NUMBER} --network "\$NET" \
                           -e ZAP_AUTH_HEADER=Cookie -e ZAP_AUTH_HEADER_VALUE='${cookie}' \
                           -e ZAP_AUTH_HEADER_SITE="\$STAGING" \
-                          ${ZAP_IMAGE} ${zapCmd} -t http://\$STAGING:5000 \
+                          ${ZAP_IMAGE} ${zapCmd} -t http://\$STAGING:5000/dashboard \
                           -c rules.tsv -r zap-report.html -J zap-report.json -w zap-report.md -I -z "-silent"
                         rm -rf zapwrk && mkdir -p zapwrk && cp .zap/rules.tsv zapwrk/ && chmod 777 zapwrk && chmod 666 zapwrk/rules.tsv
                         docker cp -a zapwrk/. zap-${BUILD_NUMBER}:/zap/wrk
